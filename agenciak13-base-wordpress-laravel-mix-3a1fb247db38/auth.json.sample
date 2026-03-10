@@ -1,0 +1,8 @@
+{
+    "http-basic": {
+        "k13-agencia-web.repo.repman.io": {
+            "username": "token",
+            "password": ""
+        }
+    }
+}

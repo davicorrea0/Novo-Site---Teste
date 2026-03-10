@@ -1,0 +1,89 @@
+<link rel="stylesheet" type="text/css" href="{{plugin_dir_url}}views/assets/css/style.css">
+<link rel="stylesheet" type="text/css" href="{{plugin_dir_url}}views/assets/css/prism.css">
+
+<div class="wrap"><div id="icon-options-general" class="icon32"><br></div>
+<div><h2>Mail Form</h2></div>
+
+<h1>
+	{{title_page}} Formulário 
+	<a href="{{admin_url}}admin.php?page=mail-form" class="page-title-action">Listar todos</a>
+</h1>
+
+<div class="postbox register-form clearfix">
+	<form method="post" action="">
+		{{edit}}
+		<div class="form-group">
+			<label>Título do formulário</label>
+			<input type="text" name="formmail[title]" value="{{title}}" id="title" class="large" required>
+		</div>
+		<div class="form-group">
+			<label>
+				Prefixo <span>Não use espaços, letras maiúsculas e/ou caracteres especiais</span>
+			</label>
+			<input type="text" name="formmail[prefix]" value="{{prefix}}" id="prefix" class="large" required>
+		</div>
+		<div class="form-group">
+			<label>
+				Emails <span>Destinatários que irão receber o email</span>
+			</label>
+			<input type="text" name="formmail[recipients]" value="{{recipients}}" placeholder="Separe por vírgulas (Ex.: example@mail.com, mail@example.com)" class="large" required>
+		</div>
+		<div class="form-group">
+			<label>Template</label>
+			<input type="text" name="formmail[template]" value="{{template}}" placeholder="Ex.: mailers/contact.html" class="large" required>
+		</div>
+		<div class="form-group">
+			<label>
+				Feedback
+				<span>Mensagem de feedback</span>
+			</label>
+			<input type="text" name="formmail[feedback]" value="{{feedback}}" class="large" required>
+		</div>
+		<button type="submit" class="page-title-action" id="btn-not-redirect">Salvar</button>
+	</form>
+</div>
+
+<h2 class="title">Detalhes para o desenvolvedor</h2>
+
+<ul class="tips">
+	<li>
+		Criar o <code>HTML</code> do seu formulário com o atributo <code>action</code> vazio
+	</li>
+	<li>
+		Crie os campos usando o mesmo prefixo definido acima (exceto campos do tipo <code>file</code>)
+		<br>
+		<strong>Exemplo com prefixo <code>contact</code>:</strong> 
+		<xmp><input name="contact[field]"></xmp>
+	</li>
+	<li>
+		Criar o campo <code>redirect</code> do tipo <code>hidden</code> em cada formulário (por padrão irá redirecionar para a <strong>Página inicial</strong>)
+	</li>
+	<li>
+		Criar o campo <code>subject</code> (assunto) em cada formulário (por padrão o assunto do email será <strong>Título do formulário - Título do Blog Wordpress</strong>)
+	</li>
+	<li>
+		Para recuperar a <code>site key</code> do <strong>Google reCaptcha</strong> no site é necessário usar o código PHP <code class="language-php">get_option('g_recaptcha_site_key')</code>
+	</li>
+	<li>
+		Para recuperar a <code>secret key</code> do <strong>Google reCaptcha</strong> no site é necessário usar o código PHP <code class="language-php">get_option('g_recaptcha_secret_key')</code>
+	</li>
+	<li>
+		Recuperando mensagens de <strong>feedback</strong>:<br><br>
+
+		O <strong>código PHP</strong> <code>FormMailHelper::feedback('prefix')</code> retorna o array com as mensagens apenas com o prefixo de cada formulário.<br><br>
+		Imprimindo mensagens (exemplo com prefixo <code>contact</code>):
+
+		<pre><code class="language-php">
+&lt;?php foreach(FormMailHelper::feedback('contact') as $message): ?>
+	&lt;?php echo $message ?>
+&lt;?php endforeach ?>
+		</code></pre>
+
+	</li>
+	<li>
+		<a href="{{admin_url}}admin.php?page=mail-form-template">Clique aqui</a> para saber os detalhes sobre os templates <code>HTML</code> para envio de email
+	</li>
+</ul>
+
+<script type="text/javascript" src="{{plugin_dir_url}}views/assets/js/script.js"></script>
+<script src="{{plugin_dir_url}}views/assets/js/prism.js"></script>

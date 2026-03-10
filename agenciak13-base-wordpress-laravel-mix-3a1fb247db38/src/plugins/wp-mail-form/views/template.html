@@ -1,0 +1,38 @@
+<link rel="stylesheet" type="text/css" href="{{plugin_dir_url}}views/assets/css/style.css">
+<link rel="stylesheet" type="text/css" href="{{plugin_dir_url}}views/assets/css/prism.css">
+
+<div class="wrap"><div id="icon-options-general" class="icon32"><br></div>
+<div><h2>Mail Form</h2></div>
+
+<h1>
+	Detalhes do template 
+</h1>
+
+<ul class="tips">
+	<li>
+		As chave extra que pode ser usada é <code>template_url</code> que é o caminho do tema <code>get_bloginfo('template_url')</code>
+	</li>
+	<li>
+		As chaves a serem substituídas dinamicamente devem estar exatamente igual ao que foi definido no atributo <code>name</code> dos campos do formulário
+	</li>
+	<li>
+		<strong>Exemplo:</strong>
+	</li>
+</ul>
+
+<pre><code class="language-markup">
+&lt;div style="width:100%;">
+	&lt;div>
+		&lt;h2>
+			{{subject}}
+		&lt;/h2>
+		&lt;p>&lt;strong>Nome:&lt;/strong> {{name}}&lt;/p>
+		&lt;p>&lt;strong>E-mail:&lt;/strong> {{email}}&lt;/p>
+		&lt;p>&lt;strong>Telefone:&lt;/strong> {{phone}}&lt;/p>
+		&lt;p>&lt;strong>Mensagem:&lt;/strong> {{message}}&lt;/p>
+	&lt;/div>
+&lt;/div>
+
+</code></pre>
+
+<script src="{{plugin_dir_url}}views/assets/js/prism.js"></script>

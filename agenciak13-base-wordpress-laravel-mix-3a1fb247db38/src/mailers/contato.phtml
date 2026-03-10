@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contato</title>
+  <style>
+    body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+    table { border-collapse: collapse !important; }
+    img { border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+    body { margin: 0 !important; padding: 0 !important; width: 100% !important; }
+    body { font-family: 'Arial', sans-serif; color: #555555; font-size: 16px; line-height: 1.5; }
+    h1, h2, h3 { margin: 0; padding: 0; }
+    h2 { font-size: 24px; color:rgb(0, 0, 0); }
+    p { margin: 0 0 1em; }
+    .email-wrapper { width: 100%; background-color: #f5f5f5; padding: 20px 0; }
+    .email-content { max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 6px; overflow: hidden; }
+    .email-header { background-color:rgba(255, 255, 255, 0); text-align: center; padding: 20px; }
+    .email-header img { max-width: 160px; height: auto; margin-bottom: 12px; }
+    .email-body { padding: 20px; }
+    .field-label { font-weight: bold; color: #333333; }
+    .email-footer { background-color: #f0f0f0; text-align: center; padding: 12px; font-size: 12px; color: #999999; }
+
+    @media screen and (max-width: 620px) {
+      .email-content { width: 100% !important; border-radius: 0 !important; }
+      .email-body { padding: 15px !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="email-wrapper">
+    <div class="email-content">
+
+      <div class="email-header">
+        <img src="##logo##" alt="Logo da Empresa" />
+        <h2>Contato</h2>
+      </div>
+
+      <div class="email-body">
+        <p><span class="field-label">Nome:</span> {{nome}}</p>
+        <p><span class="field-label">E-mail:</span> <a href="#" style="color: #3DB66E; text-decoration: none;">{{email}}</a></p>
+        <p><span class="field-label">Telefone:</span> <a href="#" style="color: #3DB66E; text-decoration: none;">{{tel}}</a></p>
+        <p><span class="field-label">Mensagem:</span></p>
+        <p style="padding: 12px; background-color: #f9f9f9; border-radius: 4px;">{{message}}</p>
+      </div>
+
+      <div class="email-footer">
+        Esta mensagem foi enviada através do formulário de contato.
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>
