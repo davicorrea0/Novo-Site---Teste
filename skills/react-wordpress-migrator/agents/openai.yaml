@@ -1,0 +1,7 @@
+interface:
+  display_name: "Migrador React -> WordPress"
+  short_description: "Converte React em tema WordPress fiel"
+  default_prompt: "Use $react-wordpress-migrator para converter um frontend React em um tema WordPress fiel, com ACF, templates PHP e animacoes preservadas."
+
+policy:
+  allow_implicit_invocation: true
