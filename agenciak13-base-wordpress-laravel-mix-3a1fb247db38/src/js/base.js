@@ -788,6 +788,28 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
+    const equalizeSegmentCards = () => {
+        const cards = Array.from(document.querySelectorAll('.cb-segment-card'));
+
+        if (cards.length === 0) {
+            return;
+        }
+
+        cards.forEach((card) => {
+            card.style.minHeight = '';
+        });
+
+        const maxHeight = Math.max(...cards.map((card) => Math.ceil(card.getBoundingClientRect().height)));
+
+        if (!Number.isFinite(maxHeight) || maxHeight <= 0) {
+            return;
+        }
+
+        cards.forEach((card) => {
+            card.style.minHeight = `${maxHeight}px`;
+        });
+    };
+
     const initSegments = () => {
         const section = document.querySelector('.cb-segments');
         const title = section?.querySelector('.cb-segments__title');
@@ -796,7 +818,21 @@ document.addEventListener('DOMContentLoaded', () => {
             .map((card) => card.querySelector('.cb-segment-card__icon svg'))
             .filter(Boolean);
 
-        if (!section || cards.length === 0 || prefersReducedMotion || typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
+        if (!section || cards.length === 0) {
+            return;
+        }
+
+        const runSegmentSizing = () => {
+            window.requestAnimationFrame(() => {
+                equalizeSegmentCards();
+            });
+        };
+
+        runSegmentSizing();
+        window.addEventListener('resize', runSegmentSizing, { passive: true });
+        window.addEventListener('load', runSegmentSizing, { once: true });
+
+        if (prefersReducedMotion || typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
             return;
         }
 

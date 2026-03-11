@@ -5,9 +5,157 @@
 
 get_header();
 
+$k13_get_image_url = static function ($image, $preferred_size = 'large') {
+    if (is_array($image)) {
+        if (!empty($image['sizes'][$preferred_size])) {
+            return (string) $image['sizes'][$preferred_size];
+        }
+
+        if (!empty($image['url'])) {
+            return (string) $image['url'];
+        }
+    }
+
+    if (is_string($image) && $image !== '') {
+        return $image;
+    }
+
+    return '';
+};
+
+$k13_get_image_alt = static function ($image, $fallback = '') {
+    if (is_array($image)) {
+        if (!empty($image['alt'])) {
+            return (string) $image['alt'];
+        }
+
+        if (!empty($image['title'])) {
+            return (string) $image['title'];
+        }
+    }
+
+    return $fallback;
+};
+
+$k13_split_lines = static function ($value) {
+    $lines = preg_split('/\r\n|\r|\n/', (string) $value);
+    $lines = array_values(array_filter(array_map('trim', (array) $lines)));
+
+    return $lines;
+};
+
+$k13_has_meaningful_value = static function ($value) {
+    if (is_array($value)) {
+        return !empty($value);
+    }
+
+    return !in_array($value, array(null, false, ''), true);
+};
+
+$home_content_page_id = 0;
+if (function_exists('get_queried_object_id')) {
+    $home_content_page_id = (int) get_queried_object_id();
+}
+
+if ($home_content_page_id <= 0 && function_exists('get_the_ID')) {
+    $home_content_page_id = (int) get_the_ID();
+}
+
+$k13_get_home_field = static function ($field_name, $default = null) use ($home_content_page_id, $k13_has_meaningful_value) {
+    if (!function_exists('get_field')) {
+        return $default;
+    }
+
+    if ($home_content_page_id > 0) {
+        $page_value = get_field($field_name, $home_content_page_id);
+
+        if ($k13_has_meaningful_value($page_value)) {
+            return $page_value;
+        }
+    }
+
+    $option_value = get_field($field_name, 'option');
+    if ($k13_has_meaningful_value($option_value)) {
+        return $option_value;
+    }
+
+    return $default;
+};
+
+$k13_get_home_text = static function ($field_name, $default = '') use ($k13_get_home_field) {
+    $value = trim((string) $k13_get_home_field($field_name, ''));
+
+    return $value !== '' ? $value : $default;
+};
+
+$k13_get_home_image = static function ($field_name, $default_url, $default_alt = '', $preferred_size = 'large') use ($k13_get_home_field, $k13_get_image_url, $k13_get_image_alt) {
+    $image = $k13_get_home_field($field_name);
+    $image_url = $k13_get_image_url($image, $preferred_size);
+
+    if ($image_url === '') {
+        return array(
+            'url' => $default_url,
+            'alt' => $default_alt,
+        );
+    }
+
+    return array(
+        'url' => $image_url,
+        'alt' => $k13_get_image_alt($image, $default_alt),
+    );
+};
+
+$k13_get_home_toggle = static function ($field_name, $default = true) use ($home_content_page_id) {
+    if (!function_exists('get_field')) {
+        return $default;
+    }
+
+    $has_page_value = false;
+    if ($home_content_page_id > 0 && function_exists('metadata_exists')) {
+        $has_page_value = metadata_exists('post', $home_content_page_id, $field_name)
+            || metadata_exists('post', $home_content_page_id, '_' . $field_name);
+    }
+
+    if ($has_page_value) {
+        $value = get_field($field_name, $home_content_page_id);
+
+        return !in_array($value, array(0, '0', false), true);
+    }
+
+    $option_key = 'options_' . $field_name;
+    $option_ref_key = '_options_' . $field_name;
+    $has_option_value = get_option($option_key, '__k13_missing__') !== '__k13_missing__'
+        || get_option($option_ref_key, '__k13_missing__') !== '__k13_missing__';
+
+    if ($has_option_value) {
+        $value = get_field($field_name, 'option');
+
+        return !in_array($value, array(0, '0', false), true);
+    }
+
+    return $default;
+};
+
 $hero_image = 'https://images.unsplash.com/photo-1600607686527-6fb886090705?q=80&w=2700&auto=format&fit=crop';
+$hero_image_alt = 'Comtudo Black';
+$hero_title_primary = 'COMTUDO';
+$hero_title_secondary = 'BLACK';
+$hero_subtitle = 'No padrao das suas escolhas.';
+$hero_cta_text = 'Saiba Mais';
+$hero_cta_url = '#sobre';
+$show_video_section = true;
 $video_poster = 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=1200&auto=format&fit=crop';
+$video_poster_alt = 'Video Comtudo Black';
 $video_embed_id = 'yBRQuQOdJl8';
+
+$about_label = 'SOBRE N&Oacute;S';
+$about_title_multiline = "EXCLUSIVIDADE DEIXA\nDE SER EXCE&Ccedil;&Atilde;O PARA\nSE TORNAR O SEU\nPADR&Atilde;O.";
+$about_texts = array(
+    'A COMTUDO BLACK &eacute; refer&ecirc;ncia em acabamentos de luxo e alt&iacute;ssima qualidade em Guarapuava, reunindo design contempor&acirc;neo, marcas exclusivas e uma experi&ecirc;ncia pensada nos m&iacute;nimos detalhes.',
+    'Um espa&ccedil;o premium que oferece acabamentos de alt&iacute;ssima qualidade, assinados por marcas consolidadas e com novidades de mercado.',
+);
+$about_card_cta_label = 'SAIBA MAIS';
+$carousel_title = 'DESCUBRA UM ESPACO ONDE ACONTECE A UNIAO PERFEITA ENTRE DESIGN E LUXO, ONDE CADA DETALHE E PENSADO PARA IMPRESSIONAR.';
 
 $about_cards = array(
     array(
@@ -103,11 +251,31 @@ $segments = array(
 );
 
 $brands = array(
-    'Eliane',
-    'Portinari',
-    'Kohler',
-    'Decortiles',
-    'Ceusa',
+    array(
+        'name' => 'Eliane',
+        'logo_url' => '',
+        'logo_alt' => 'Eliane',
+    ),
+    array(
+        'name' => 'Portinari',
+        'logo_url' => '',
+        'logo_alt' => 'Portinari',
+    ),
+    array(
+        'name' => 'Kohler',
+        'logo_url' => '',
+        'logo_alt' => 'Kohler',
+    ),
+    array(
+        'name' => 'Decortiles',
+        'logo_url' => '',
+        'logo_alt' => 'Decortiles',
+    ),
+    array(
+        'name' => 'Ceusa',
+        'logo_url' => '',
+        'logo_alt' => 'Ceusa',
+    ),
 );
 
 $segment_icons = array(
@@ -130,160 +298,179 @@ $location_subtitle = 'VISITE O ENDEREÇO DA EXCLUSIVIDADE.';
 $location_name = 'Comtudo Black';
 $location_address = "Rua Laurindo Richa, 304,\nGuarapuava - Paraná";
 $location_directions_url = 'https://www.google.com/maps/dir/?api=1&destination=Rua+Laurindo+Richa,+304,+Guarapuava+-+PR';
+$location_directions_label = 'Rotas';
 $location_map_url = 'https://maps.google.com/maps?q=Rua+Laurindo+Richa,+304,+Guarapuava+-+PR';
+$location_map_label = 'Ampliar';
 $location_map_embed_url = 'https://maps.google.com/maps?q=Rua+Laurindo+Richa,+304,+Guarapuava+-+PR&t=&z=18&ie=UTF8&iwloc=near&output=embed';
 $contact_title = 'FALE CONOSCO';
 $contact_phone = 'WhatsApp e Telefone: (42) 3629-9700';
 $contact_whatsapp_url = 'https://wa.me/554236299700';
 
-if (function_exists('get_field')) {
-    $acf_segments_heading = (string) get_field('home_segments_heading', 'option');
-    if ($acf_segments_heading !== '') {
-        $segments_heading = $acf_segments_heading;
+$hero_image_data = $k13_get_home_image('home_hero_image', $hero_image, $hero_image_alt, 'full');
+$hero_image = $hero_image_data['url'];
+$hero_image_alt = $hero_image_data['alt'];
+
+$hero_title_primary = $k13_get_home_text('home_hero_title_primary', $hero_title_primary);
+$hero_title_secondary = $k13_get_home_text('home_hero_title_secondary', $hero_title_secondary);
+$hero_subtitle = $k13_get_home_text('home_hero_subtitle', $hero_subtitle);
+$hero_cta_text = $k13_get_home_text('home_hero_cta_text', $hero_cta_text);
+$hero_cta_url = $k13_get_home_text('home_hero_cta_url', $hero_cta_url);
+
+$show_video_section = $k13_get_home_toggle('home_show_video', $show_video_section);
+$video_poster_data = $k13_get_home_image('home_video_poster', $video_poster, $video_poster_alt);
+$video_poster = $video_poster_data['url'];
+$video_poster_alt = $video_poster_data['alt'];
+$video_embed_id = $k13_get_home_text('home_video_embed_id', $video_embed_id);
+
+$about_label = $k13_get_home_text('home_about_label', $about_label);
+$about_title_multiline = $k13_get_home_text('home_about_title_multiline', $about_title_multiline);
+$about_texts[0] = $k13_get_home_text('home_about_text_1', $about_texts[0]);
+$about_texts[1] = $k13_get_home_text('home_about_text_2', $about_texts[1]);
+$about_card_cta_label = $k13_get_home_text('home_about_card_cta_label', $about_card_cta_label);
+$carousel_title = $k13_get_home_text('home_carousel_title', $carousel_title);
+
+$acf_about_cards = $k13_get_home_field('home_about_cards', array());
+if (is_array($acf_about_cards) && !empty($acf_about_cards)) {
+    $dynamic_about_cards = array();
+
+    foreach ($acf_about_cards as $acf_about_card) {
+        $card_title = isset($acf_about_card['title']) ? trim((string) $acf_about_card['title']) : '';
+        if ($card_title === '') {
+            continue;
+        }
+
+        $card_title_lines = isset($acf_about_card['title_lines']) ? $k13_split_lines($acf_about_card['title_lines']) : array();
+        if (empty($card_title_lines)) {
+            $card_title_lines = array($card_title);
+        }
+
+        $card_description = isset($acf_about_card['description']) ? trim((string) $acf_about_card['description']) : '';
+        if ($card_description === '') {
+            $card_description = 'Conteudo em atualizacao.';
+        }
+
+        $card_image = isset($acf_about_card['image']) ? $acf_about_card['image'] : null;
+        $card_image_url = $k13_get_image_url($card_image, 'large');
+        if ($card_image_url === '') {
+            continue;
+        }
+
+        $dynamic_about_cards[] = array(
+            'title'       => $card_title,
+            'title_lines' => $card_title_lines,
+            'description' => $card_description,
+            'image'       => $card_image_url,
+            'image_alt'   => $k13_get_image_alt($card_image, $card_title),
+        );
     }
 
-    $acf_brands_heading = (string) get_field('home_brands_heading', 'option');
-    if ($acf_brands_heading !== '') {
-        $brands_heading = $acf_brands_heading;
+    if (!empty($dynamic_about_cards)) {
+        $about_cards = $dynamic_about_cards;
+    }
+}
+
+$segments_heading = $k13_get_home_text('home_segments_heading', $segments_heading);
+$brands_heading = $k13_get_home_text('home_brands_heading', $brands_heading);
+
+$acf_segments = $k13_get_home_field('home_segments_data', array());
+if (is_array($acf_segments) && !empty($acf_segments)) {
+    $dynamic_segments = array();
+
+    foreach ($acf_segments as $segment_index => $acf_segment) {
+        $icon_slug = isset($acf_segment['icon']) ? sanitize_key((string) $acf_segment['icon']) : '';
+        if ($icon_slug === '' || !isset($segment_icons[$icon_slug])) {
+            $icon_slug = $segment_icon_fallbacks[$segment_index % count($segment_icon_fallbacks)];
+        }
+
+        $title = isset($acf_segment['title']) ? trim((string) $acf_segment['title']) : '';
+        if ($title === '') {
+            $title = 'SEGMENTO';
+        }
+
+        $items_text = isset($acf_segment['items']) ? (string) $acf_segment['items'] : '';
+        $items = preg_split('/\r\n|\r|\n/', $items_text);
+        $items = array_values(array_filter(array_map('trim', (array) $items)));
+        if (empty($items)) {
+            $items = array('Conteudo em atualizacao.');
+        }
+
+        $dynamic_segments[] = array(
+            'icon'  => $icon_slug,
+            'title' => $title,
+            'items' => $items,
+        );
     }
 
-    $acf_segments = get_field('home_segments_data', 'option');
-    if (is_array($acf_segments) && !empty($acf_segments)) {
-        $dynamic_segments = array();
+    if (!empty($dynamic_segments)) {
+        $segments = $dynamic_segments;
+    }
+}
 
-        foreach ($acf_segments as $segment_index => $acf_segment) {
-            $icon_slug = isset($acf_segment['icon']) ? sanitize_key((string) $acf_segment['icon']) : '';
-            if ($icon_slug === '' || !isset($segment_icons[$icon_slug])) {
-                $icon_slug = $segment_icon_fallbacks[$segment_index % count($segment_icon_fallbacks)];
-            }
+$acf_brands = $k13_get_home_field('home_brands_data', array());
+if (is_array($acf_brands) && !empty($acf_brands)) {
+    $dynamic_brands = array();
 
-            $title = isset($acf_segment['title']) ? trim((string) $acf_segment['title']) : '';
-            if ($title === '') {
-                $title = 'SEGMENTO';
-            }
+    foreach ($acf_brands as $acf_brand) {
+        $brand_name = isset($acf_brand['name']) ? trim((string) $acf_brand['name']) : '';
+        $brand_logo = isset($acf_brand['logo']) ? $acf_brand['logo'] : null;
+        $brand_logo_url = $k13_get_image_url($brand_logo, 'large');
+        $brand_logo_alt = $k13_get_image_alt($brand_logo, $brand_name !== '' ? $brand_name : 'Marca');
 
-            $items_text = isset($acf_segment['items']) ? (string) $acf_segment['items'] : '';
-            $items = preg_split('/\r\n|\r|\n/', $items_text);
-            $items = array_values(array_filter(array_map('trim', (array) $items)));
-            if (empty($items)) {
-                $items = array('Conteúdo em atualização.');
-            }
-
-            $dynamic_segments[] = array(
-                'icon'  => $icon_slug,
-                'title' => $title,
-                'items' => $items,
+        if ($brand_logo_url !== '' || $brand_name !== '') {
+            $dynamic_brands[] = array(
+                'name' => $brand_name,
+                'logo_url' => $brand_logo_url,
+                'logo_alt' => $brand_logo_alt,
             );
         }
-
-        if (!empty($dynamic_segments)) {
-            $segments = $dynamic_segments;
-        }
     }
 
-    $acf_brands = get_field('home_brands_data', 'option');
-    if (is_array($acf_brands) && !empty($acf_brands)) {
-        $dynamic_brands = array();
-        foreach ($acf_brands as $acf_brand) {
-            $brand_name = isset($acf_brand['name']) ? trim((string) $acf_brand['name']) : '';
-            if ($brand_name !== '') {
-                $dynamic_brands[] = $brand_name;
-            }
-        }
-
-        if (!empty($dynamic_brands)) {
-            $brands = $dynamic_brands;
-        }
+    if (!empty($dynamic_brands)) {
+        $brands = $dynamic_brands;
     }
+}
 
-    $acf_gallery = get_field('home_gallery_images', 'option');
-    if (is_array($acf_gallery) && !empty($acf_gallery)) {
-        $dynamic_gallery_images = array();
-        foreach ($acf_gallery as $gallery_image) {
-            $src = '';
-            if (is_array($gallery_image)) {
-                if (!empty($gallery_image['sizes']['large'])) {
-                    $src = (string) $gallery_image['sizes']['large'];
-                } elseif (!empty($gallery_image['url'])) {
-                    $src = (string) $gallery_image['url'];
-                }
-            }
+$acf_gallery = $k13_get_home_field('home_gallery_images', array());
+if (is_array($acf_gallery) && !empty($acf_gallery)) {
+    $dynamic_gallery_images = array();
 
-            if ($src === '') {
-                continue;
-            }
-
-            $alt = '';
-            if (is_array($gallery_image) && !empty($gallery_image['alt'])) {
-                $alt = (string) $gallery_image['alt'];
-            } elseif (is_array($gallery_image) && !empty($gallery_image['title'])) {
-                $alt = (string) $gallery_image['title'];
-            }
-
-            if ($alt === '') {
-                $alt = 'Projeto';
-            }
-
-            $dynamic_gallery_images[] = array(
-                'src' => $src,
-                'alt' => $alt,
-            );
+    foreach ($acf_gallery as $gallery_image) {
+        $src = $k13_get_image_url($gallery_image, 'large');
+        if ($src === '') {
+            continue;
         }
 
-        if (!empty($dynamic_gallery_images)) {
-            $gallery_images = $dynamic_gallery_images;
-        }
+        $dynamic_gallery_images[] = array(
+            'src' => $src,
+            'alt' => $k13_get_image_alt($gallery_image, 'Projeto'),
+        );
     }
 
-    $acf_location_title = trim((string) get_field('home_location_title', 'option'));
-    if ($acf_location_title !== '') {
-        $location_title = $acf_location_title;
+    if (!empty($dynamic_gallery_images)) {
+        $gallery_images = $dynamic_gallery_images;
     }
+}
 
-    $acf_location_subtitle = trim((string) get_field('home_location_subtitle', 'option'));
-    if ($acf_location_subtitle !== '') {
-        $location_subtitle = $acf_location_subtitle;
-    }
+$location_title = $k13_get_home_text('home_location_title', $location_title);
+$location_subtitle = $k13_get_home_text('home_location_subtitle', $location_subtitle);
+$location_name = $k13_get_home_text('home_location_name', $location_name);
+$location_address = $k13_get_home_text('home_location_address', $location_address);
+$location_directions_url = $k13_get_home_text('home_location_directions_url', $location_directions_url);
+$location_directions_label = $k13_get_home_text('home_location_directions_label', $location_directions_label);
+$location_map_url = $k13_get_home_text('home_location_map_url', $location_map_url);
+$location_map_label = $k13_get_home_text('home_location_map_label', $location_map_label);
+$location_map_embed_url = $k13_get_home_text('home_location_map_embed_url', $location_map_embed_url);
+$contact_title = $k13_get_home_text('home_contact_title', $contact_title);
+$contact_phone = $k13_get_home_text('home_contact_phone', $contact_phone);
+$contact_whatsapp_url = $k13_get_home_text('home_contact_whatsapp_url', $contact_whatsapp_url);
+$about_title_lines = $k13_split_lines($about_title_multiline);
+if (empty($about_title_lines)) {
+    $about_title_lines = array('EXCLUSIVIDADE DEIXA DE SER EXCECAO PARA SE TORNAR O SEU PADRAO.');
+}
 
-    $acf_location_name = trim((string) get_field('home_location_name', 'option'));
-    if ($acf_location_name !== '') {
-        $location_name = $acf_location_name;
-    }
-
-    $acf_location_address = trim((string) get_field('home_location_address', 'option'));
-    if ($acf_location_address !== '') {
-        $location_address = $acf_location_address;
-    }
-
-    $acf_location_directions_url = trim((string) get_field('home_location_directions_url', 'option'));
-    if ($acf_location_directions_url !== '') {
-        $location_directions_url = $acf_location_directions_url;
-    }
-
-    $acf_location_map_url = trim((string) get_field('home_location_map_url', 'option'));
-    if ($acf_location_map_url !== '') {
-        $location_map_url = $acf_location_map_url;
-    }
-
-    $acf_location_map_embed_url = trim((string) get_field('home_location_map_embed_url', 'option'));
-    if ($acf_location_map_embed_url !== '') {
-        $location_map_embed_url = $acf_location_map_embed_url;
-    }
-
-    $acf_contact_title = trim((string) get_field('home_contact_title', 'option'));
-    if ($acf_contact_title !== '') {
-        $contact_title = $acf_contact_title;
-    }
-
-    $acf_contact_phone = trim((string) get_field('home_contact_phone', 'option'));
-    if ($acf_contact_phone !== '') {
-        $contact_phone = $acf_contact_phone;
-    }
-
-    $acf_contact_whatsapp_url = trim((string) get_field('home_contact_whatsapp_url', 'option'));
-    if ($acf_contact_whatsapp_url !== '') {
-        $contact_whatsapp_url = $acf_contact_whatsapp_url;
-    }
+$about_title_plain = trim(wp_strip_all_tags(str_replace(array("\r\n", "\r", "\n"), ' ', $about_title_multiline)));
+if ($about_title_plain === '') {
+    $about_title_plain = implode(' ', $about_title_lines);
 }
 
 if (empty($gallery_images)) {
@@ -343,7 +530,7 @@ $svg_allowed = array(
                 <img
                     id="cb-hero-img"
                     src="<?php echo esc_url($hero_image); ?>"
-                    alt="Comtudo Black"
+                    alt="<?php echo esc_attr($hero_image_alt); ?>"
                     class="cb-hero__img"
                     loading="eager"
                 >
@@ -352,27 +539,27 @@ $svg_allowed = array(
         </div>
 
         <div class="cb-hero__content">
-            <div style="max-width: 80rem;">
+            <div class="cb-hero__content-inner">
                 <h1 class="cb-hero__title">
                     <span class="cb-hero__title-word">
-                        <span class="cb-hero__title-inner cb-hero__title-inner--medium" data-hero-word="1">COMTUDO</span>
+                        <span class="cb-hero__title-inner cb-hero__title-inner--medium" data-hero-word="1"><?php echo esc_html($hero_title_primary); ?></span>
                     </span>
                     <span class="cb-hero__title-word">
-                        <span class="cb-hero__title-inner cb-hero__title-inner--light" data-hero-word="2">BLACK</span>
+                        <span class="cb-hero__title-inner cb-hero__title-inner--light" data-hero-word="2"><?php echo esc_html($hero_title_secondary); ?></span>
                     </span>
                 </h1>
 
                 <div class="cb-hero__subtitle-area" id="cb-hero-subtitle">
-                    <p class="cb-hero__subtitle">No padrão das suas escolhas.</p>
+                    <p class="cb-hero__subtitle"><?php echo esc_html($hero_subtitle); ?></p>
 
-                    <a href="#sobre" class="cb-hero__cta">
+                    <a href="<?php echo esc_url($hero_cta_url); ?>" class="cb-hero__cta">
                         <div class="cb-hero__cta-icon">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <line x1="12" y1="5" x2="12" y2="19"></line>
                                 <polyline points="19 12 12 19 5 12"></polyline>
                             </svg>
                         </div>
-                        <span class="cb-hero__cta-text">Saiba Mais</span>
+                        <span class="cb-hero__cta-text"><?php echo esc_html($hero_cta_text); ?></span>
                     </a>
                 </div>
             </div>
@@ -380,10 +567,11 @@ $svg_allowed = array(
     </div>
 </section>
 
+<?php if ($show_video_section) : ?>
 <section class="cb-video">
     <div class="cb-video__container">
         <button id="cb-video-thumbnail" class="cb-video__thumbnail" type="button" aria-label="<?php esc_attr_e('Reproduzir vídeo', 'comtudo-black'); ?>">
-            <img class="cb-video__thumb-img" src="<?php echo esc_url($video_poster); ?>" alt="Vídeo Comtudo Black">
+            <img class="cb-video__thumb-img" src="<?php echo esc_url($video_poster); ?>" alt="<?php echo esc_attr($video_poster_alt); ?>">
             <div class="cb-video__thumb-overlay">
                 <div class="cb-video__play-btn">
                     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -408,47 +596,38 @@ $svg_allowed = array(
         <div id="cb-video-player" class="cb-video-modal__player" data-video-id="<?php echo esc_attr($video_embed_id); ?>"></div>
     </div>
 </div>
+<?php endif; ?>
 
 <section id="sobre" class="cb-about">
     <div class="cb-about__container">
         <div class="cb-about__label">
             <span class="cb-about__label-dot"></span>
-            <span class="cb-about__label-text cb-about__label-text--fixed">SOBRE N&Oacute;S</span>
-            <span class="cb-about__label-text">SOBRE NÃ“S</span>
+            <span class="cb-about__label-text cb-about__label-text--fixed"><?php echo wp_kses_post($about_label); ?></span>
+            <span class="cb-about__label-text"><?php echo wp_kses_post($about_label); ?></span>
         </div>
 
         <div class="cb-about__intro">
             <div class="cb-about__intro-main">
                 <h2 class="cb-about__title cb-about__title--fixed">
-                    <span class="cb-about__title-line">
-                        <span>EXCLUSIVIDADE</span>
-                        <span>DEIXA</span>
-                    </span>
-                    <span class="cb-about__title-line">
-                        <span>DE SER EXCE&Ccedil;&Atilde;O</span>
-                        <span>PARA</span>
-                    </span>
-                    <span class="cb-about__title-line">
-                        <span>SE TORNAR</span>
-                        <span>O SEU</span>
-                    </span>
-                    <span class="cb-about__title-line cb-about__title-line--last">
-                        <span>PADR&Atilde;O.</span>
-                    </span>
+                    <?php foreach ($about_title_lines as $about_title_line_index => $about_title_line) : ?>
+                        <span class="cb-about__title-line<?php echo $about_title_line_index === count($about_title_lines) - 1 ? ' cb-about__title-line--last' : ''; ?>">
+                            <span><?php echo wp_kses_post($about_title_line); ?></span>
+                        </span>
+                    <?php endforeach; ?>
                 </h2>
                 <div class="cb-about__label">
                     <span class="cb-about__label-dot"></span>
-                    <span class="cb-about__label-text">SOBRE NÓS</span>
+                    <span class="cb-about__label-text"><?php echo wp_kses_post($about_label); ?></span>
                 </div>
-                <h2 class="cb-about__title">EXCLUSIVIDADE DEIXA DE SER EXCEÇÃO PARA SE TORNAR O SEU PADRÃO.</h2>
+                <h2 class="cb-about__title"><?php echo wp_kses_post($about_title_plain); ?></h2>
             </div>
 
             <div class="cb-about__intro-copy">
                 <div class="cb-about__desc">
-                    <p class="cb-about__text-fixed">A COMTUDO BLACK &eacute; refer&ecirc;ncia em acabamentos de luxo e alt&iacute;ssima qualidade em Guarapuava, reunindo design contempor&acirc;neo, marcas exclusivas e uma experi&ecirc;ncia pensada nos m&iacute;nimos detalhes.</p>
-                    <p class="cb-about__text-fixed">Um espa&ccedil;o premium que oferece acabamentos de alt&iacute;ssima qualidade, assinados por marcas consolidadas e com novidades de mercado.</p>
-                    <p>A COMTUDO BLACK é referência em acabamentos de luxo e altíssima qualidade em Guarapuava, reunindo design contemporâneo, marcas exclusivas e uma experiência pensada nos mínimos detalhes.</p>
-                    <p>Um espaço premium que oferece acabamentos de altíssima qualidade, assinados por marcas consolidadas e com novidades de mercado.</p>
+                    <p class="cb-about__text-fixed"><?php echo wp_kses_post($about_texts[0]); ?></p>
+                    <p class="cb-about__text-fixed"><?php echo wp_kses_post($about_texts[1]); ?></p>
+                    <p><?php echo wp_kses_post($about_texts[0]); ?></p>
+                    <p><?php echo wp_kses_post($about_texts[1]); ?></p>
                 </div>
             </div>
         </div>
@@ -458,7 +637,7 @@ $svg_allowed = array(
                 <div class="col-12 col-md-6 col-xl-3 cb-about__card-col">
                     <article class="cb-about-card">
                         <div class="cb-about-card__front">
-                            <img class="cb-about-card__img" src="<?php echo esc_url($about_card['image']); ?>" alt="<?php echo esc_attr($about_card['title']); ?>">
+                            <img class="cb-about-card__img" src="<?php echo esc_url($about_card['image']); ?>" alt="<?php echo esc_attr(isset($about_card['image_alt']) ? $about_card['image_alt'] : $about_card['title']); ?>">
                             <div class="cb-about-card__dark-overlay"></div>
                             <div class="cb-about-card__gradient"></div>
 
@@ -482,7 +661,7 @@ $svg_allowed = array(
                             <h3 class="cb-about-card__back-title"><?php echo esc_html($about_card['title']); ?></h3>
                             <p class="cb-about-card__back-desc"><?php echo esc_html($about_card['description']); ?></p>
                             <div class="cb-about-card__back-cta">
-                                <span>SAIBA MAIS</span>
+                                <span><?php echo esc_html($about_card_cta_label); ?></span>
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                     <line x1="7" y1="17" x2="17" y2="7"></line>
                                     <polyline points="7 7 17 7 17 17"></polyline>
@@ -499,7 +678,7 @@ $svg_allowed = array(
 <section class="cb-carousel-section">
     <div class="cb-carousel__wrapper">
         <div class="cb-carousel__header">
-            <h2 class="cb-carousel__title">DESCUBRA UM ESPAÇO ONDE ACONTECE A UNIÃO PERFEITA ENTRE DESIGN E LUXO, ONDE CADA DETALHE É PENSADO PARA IMPRESSIONAR.</h2>
+            <h2 class="cb-carousel__title"><?php echo wp_kses_post($carousel_title); ?></h2>
 
             <div class="cb-carousel__nav-btns">
                 <button id="cb-carousel-prev" class="cb-carousel__nav-btn" type="button" aria-label="<?php esc_attr_e('Slide anterior', 'comtudo-black'); ?>">
@@ -602,8 +781,19 @@ $svg_allowed = array(
 
         <div class="cb-brands__marquee">
             <div class="cb-brands__track">
-                <?php foreach ($brand_track as $brand_name) : ?>
-                    <span class="cb-brands__logo"><?php echo esc_html(strtoupper($brand_name)); ?></span>
+                <?php foreach ($brand_track as $brand_item) : ?>
+                    <?php
+                    $brand_name = is_array($brand_item) ? (string) ($brand_item['name'] ?? '') : (string) $brand_item;
+                    $brand_logo_url = is_array($brand_item) ? (string) ($brand_item['logo_url'] ?? '') : '';
+                    $brand_logo_alt = is_array($brand_item) ? (string) ($brand_item['logo_alt'] ?? $brand_name) : $brand_name;
+                    ?>
+                    <span class="cb-brands__logo<?php echo $brand_logo_url !== '' ? ' cb-brands__logo--image' : ''; ?>">
+                        <?php if ($brand_logo_url !== '') : ?>
+                            <img class="cb-brands__logo-image" src="<?php echo esc_url($brand_logo_url); ?>" alt="<?php echo esc_attr($brand_logo_alt); ?>">
+                        <?php else : ?>
+                            <?php echo esc_html(strtoupper($brand_name)); ?>
+                        <?php endif; ?>
+                    </span>
                 <?php endforeach; ?>
             </div>
         </div>
@@ -643,14 +833,14 @@ $svg_allowed = array(
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <polygon points="3 11 22 2 13 21 11 13 3 11"></polygon>
                             </svg>
-                            <span>Rotas</span>
+                            <span><?php echo esc_html($location_directions_label); ?></span>
                         </a>
                         <a class="cb-location__link cb-location__link--ghost" href="<?php echo esc_url($location_map_url); ?>" target="_blank" rel="noopener noreferrer">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <path d="M7 17L17 7"></path>
                                 <polyline points="7 7 17 7 17 17"></polyline>
                             </svg>
-                            <span>Ampliar</span>
+                            <span><?php echo esc_html($location_map_label); ?></span>
                         </a>
                     </div>
                 </div>

@@ -85,6 +85,9 @@ function do_header()
     $theme_url = get_template_directory_uri();
 
     cb_render_favicon_tags();
+    ?><link rel="preconnect" href="https://fonts.googleapis.com"><?php
+    ?><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><?php
+    ?><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap"><?php
     ?><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"><?php
     ?><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"><?php
     ?><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/plyr@3.8.4/dist/plyr.css"><?php
