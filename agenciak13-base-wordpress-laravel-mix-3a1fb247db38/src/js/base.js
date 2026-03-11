@@ -1,7 +1,7 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Swiper from 'swiper';
-import { FreeMode, Navigation } from 'swiper/modules';
+import { Navigation } from 'swiper/modules';
 import Plyr from 'plyr';
 import { animate as motionDevAnimate } from 'motion';
 
@@ -743,11 +743,10 @@ document.addEventListener('DOMContentLoaded', () => {
             '.cb-about__desc',
             '.cb-about-card',
             '.cb-carousel__wrapper',
-            '.cb-segment-card',
             '.cb-brands__header',
-            '.cb-location__map-wrap',
-            '.cb-contact__container',
-            '.cb-footer'
+            '.cb-location__header',
+            '.cb-location__card',
+            '.cb-contact__container'
         ].join(','));
 
         revealTargets.forEach((element) => {
@@ -789,7 +788,90 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
+    const initSegments = () => {
+        const section = document.querySelector('.cb-segments');
+        const title = section?.querySelector('.cb-segments__title');
+        const cards = section ? Array.from(section.querySelectorAll('.cb-segment-card')) : [];
+        const icons = cards
+            .map((card) => card.querySelector('.cb-segment-card__icon svg'))
+            .filter(Boolean);
+
+        if (!section || cards.length === 0 || prefersReducedMotion || typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
+            return;
+        }
+
+        const segmentsTimeline = gsap.timeline({
+            scrollTrigger: {
+                trigger: section,
+                start: 'top 78%',
+                once: true
+            }
+        });
+
+        if (title) {
+            segmentsTimeline.fromTo(title, {
+                opacity: 0,
+                y: 24
+            }, {
+                opacity: 1,
+                y: 0,
+                duration: 0.7,
+                ease: 'power3.out',
+                clearProps: 'opacity,transform'
+            });
+        }
+
+        segmentsTimeline.fromTo(cards, {
+            opacity: 0,
+            y: 20
+        }, {
+            opacity: 1,
+            y: 0,
+            duration: 0.65,
+            stagger: 0.1,
+            ease: 'power3.out',
+            clearProps: 'opacity,transform'
+        }, title ? '-=0.35' : 0);
+
+        if (icons.length > 0) {
+            segmentsTimeline.fromTo(icons, {
+                opacity: 0,
+                scale: 0.82,
+                transformOrigin: '50% 50%'
+            }, {
+                opacity: 1,
+                scale: 1,
+                duration: 0.45,
+                stagger: 0.08,
+                ease: 'back.out(1.4)',
+                clearProps: 'opacity,transform'
+            }, '-=0.45');
+        }
+    };
+
+    const initBrands = () => {
+        const brandsTrack = document.querySelector('.cb-brands__track');
+
+        if (!brandsTrack || prefersReducedMotion || typeof gsap === 'undefined') {
+            return;
+        }
+
+        gsap.killTweensOf(brandsTrack);
+        gsap.set(brandsTrack, {
+            xPercent: 0
+        });
+
+        gsap.to(brandsTrack, {
+            xPercent: -50,
+            duration: 30,
+            ease: 'none',
+            repeat: -1
+        });
+    };
+
     const initGallery = () => {
+        const carouselWrapper = document.querySelector('.cb-carousel__wrapper');
+        const carouselMotion = document.querySelector('.cb-carousel__motion');
         const swiperElement = document.querySelector('.cb-gallery-swiper');
         const galleryItems = Array.from(document.querySelectorAll('.cb-gallery-item'));
         const lightbox = document.getElementById('cb-lightbox');
@@ -798,18 +880,30 @@ document.addEventListener('DOMContentLoaded', () => {
         const lightboxPrev = document.getElementById('cb-lightbox-prev');
         const lightboxNext = document.getElementById('cb-lightbox-next');
 
+        if (carouselWrapper && carouselMotion && !prefersReducedMotion && typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+            gsap.fromTo(carouselMotion, {
+                xPercent: 0
+            }, {
+                xPercent: -15,
+                ease: 'none',
+                scrollTrigger: {
+                    trigger: carouselWrapper,
+                    start: 'top bottom',
+                    end: 'bottom top',
+                    scrub: true
+                }
+            });
+        }
+
         if (swiperElement && typeof Swiper !== 'undefined') {
-            // Swiper v11 requires modules passed explicitly.
+            // Keep the React-like one-slide stepping while preserving drag support.
             new Swiper(swiperElement, {
-                modules: [Navigation, FreeMode],
+                modules: [Navigation],
                 slidesPerView: 'auto',
                 spaceBetween: 24,
                 grabCursor: true,
                 speed: 700,
-                freeMode: {
-                    enabled: true,
-                    momentumRatio: 0.35
-                },
+                rewind: true,
                 navigation: {
                     prevEl: '#cb-carousel-prev',
                     nextEl: '#cb-carousel-next'
@@ -916,33 +1010,209 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const initVideo = () => {
         const videoThumbnail = document.getElementById('cb-video-thumbnail');
+        const videoModal = document.getElementById('cb-video-modal');
+        const videoModalClose = document.getElementById('cb-video-modal-close');
+        const videoModalDialog = document.getElementById('cb-video-modal-dialog');
         const videoPlayerContainer = document.getElementById('cb-video-player');
-        const videoElement = document.getElementById('cb-plyr-video');
+        const videoId = videoPlayerContainer?.dataset.videoId;
 
-        if (!videoThumbnail || !videoPlayerContainer || !videoElement || typeof Plyr === 'undefined') {
+        if (!videoThumbnail || !videoModal || !videoModalClose || !videoModalDialog || !videoPlayerContainer || !videoId || typeof Plyr === 'undefined') {
             return;
         }
 
+        videoThumbnail.setAttribute('aria-controls', 'cb-video-modal');
+        videoThumbnail.setAttribute('aria-expanded', 'false');
+
+        const videoElement = document.createElement('div');
+        videoElement.id = 'cb-plyr-video';
+        videoElement.setAttribute('data-plyr-provider', 'youtube');
+        videoElement.setAttribute('data-plyr-embed-id', videoId);
+        videoPlayerContainer.appendChild(videoElement);
+
         const player = new Plyr(videoElement, {
+            autoplay: false,
             controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'],
-            resetOnEnd: true
+            youtube: {
+                rel: 0,
+                noCookie: true,
+                modestbranding: 1,
+                playsinline: 1,
+                iv_load_policy: 3
+            }
         });
 
-        videoThumbnail.addEventListener('click', () => {
-            videoThumbnail.hidden = true;
-            videoPlayerContainer.hidden = false;
+        const openVideoModal = () => {
+            videoModal.classList.add('is-open');
+            videoModal.setAttribute('aria-hidden', 'false');
+            videoThumbnail.setAttribute('aria-expanded', 'true');
+            document.body.style.overflow = 'hidden';
+            videoModalClose.focus();
 
-            motionAnimate(videoPlayerContainer, {
-                opacity: [0, 1]
-            }, {
-                duration: 0.35,
-                easing: 'ease-out'
+            window.requestAnimationFrame(() => {
+                try {
+                    const playPromise = player.play();
+                    if (playPromise && typeof playPromise.catch === 'function') {
+                        playPromise.catch(() => {
+                            // Ignore autoplay rejection.
+                        });
+                    }
+                } catch (error) {
+                    // Ignore player readiness issues until the iframe is available.
+                }
             });
+        };
 
-            player.play().catch(() => {
-                // Ignore autoplay rejection.
+        const closeVideoModal = () => {
+            if (!videoModal.classList.contains('is-open')) {
+                return;
+            }
+
+            videoModal.classList.remove('is-open');
+            videoModal.setAttribute('aria-hidden', 'true');
+            videoThumbnail.setAttribute('aria-expanded', 'false');
+            document.body.style.overflow = '';
+
+            try {
+                player.pause();
+            } catch (error) {
+                // Ignore pause errors if the player is still booting.
+            }
+
+            videoThumbnail.focus();
+        };
+
+        videoThumbnail.addEventListener('click', openVideoModal);
+
+        videoModalClose.addEventListener('click', (event) => {
+            event.stopPropagation();
+            closeVideoModal();
+        });
+
+        videoModal.addEventListener('click', closeVideoModal);
+        videoModalDialog.addEventListener('click', (event) => {
+            event.stopPropagation();
+        });
+
+        document.addEventListener('keydown', (event) => {
+            if (!videoModal.classList.contains('is-open')) {
+                return;
+            }
+
+            if (event.key === 'Escape') {
+                closeVideoModal();
+            }
+        });
+
+        window.addEventListener('beforeunload', () => {
+            document.body.style.overflow = '';
+
+            try {
+                player.destroy();
+            } catch (error) {
+                // Ignore cleanup errors on navigation.
+            }
+        });
+    };
+
+    const initCookieConsent = () => {
+        const banner = document.getElementById('cb-cookie-consent');
+        const actionButtons = banner ? Array.from(banner.querySelectorAll('[data-cookie-consent-action]')) : [];
+        const storageKey = 'cookie-consent';
+
+        if (!banner || actionButtons.length === 0) {
+            return;
+        }
+
+        const getStoredConsent = () => {
+            try {
+                return window.localStorage.getItem(storageKey);
+            } catch (error) {
+                return null;
+            }
+        };
+
+        const setStoredConsent = (value) => {
+            try {
+                window.localStorage.setItem(storageKey, value);
+            } catch (error) {
+                // Ignore storage issues so the banner still remains usable.
+            }
+        };
+
+        if (getStoredConsent()) {
+            return;
+        }
+
+        let revealTimerId = null;
+        let hideTimerId = null;
+        let isDismissed = false;
+
+        const setBannerHiddenState = (isHidden) => {
+            if (isHidden) {
+                banner.setAttribute('hidden', 'hidden');
+                banner.setAttribute('aria-hidden', 'true');
+                return;
+            }
+
+            banner.removeAttribute('hidden');
+            banner.setAttribute('aria-hidden', 'false');
+        };
+
+        const isLoaderActive = () => {
+            return document.body.classList.contains('cb-loading')
+                || document.body.classList.contains('cb-hero-locked')
+                || Boolean(document.getElementById('cb-loader'));
+        };
+
+        const revealBanner = () => {
+            if (isDismissed || getStoredConsent()) {
+                return;
+            }
+
+            if (isLoaderActive()) {
+                window.setTimeout(revealBanner, 180);
+                return;
+            }
+
+            setBannerHiddenState(false);
+            banner.classList.remove('is-hiding');
+
+            window.requestAnimationFrame(() => {
+                banner.classList.add('is-visible');
+            });
+        };
+
+        const closeBanner = (consentValue) => {
+            if (isDismissed) {
+                return;
+            }
+
+            isDismissed = true;
+            window.clearTimeout(revealTimerId);
+            window.clearTimeout(hideTimerId);
+            setStoredConsent(consentValue);
+
+            banner.classList.remove('is-visible');
+            banner.classList.add('is-hiding');
+            banner.setAttribute('aria-hidden', 'true');
+
+            hideTimerId = window.setTimeout(() => {
+                banner.classList.remove('is-hiding');
+                setBannerHiddenState(true);
+            }, 650);
+        };
+
+        actionButtons.forEach((button) => {
+            button.addEventListener('click', () => {
+                const action = button.dataset.cookieConsentAction === 'accept'
+                    ? 'accepted'
+                    : 'declined';
+
+                closeBanner(action);
             });
         });
+
+        revealTimerId = window.setTimeout(revealBanner, 2000);
     };
 
     const initSmoothScroll = () => {
@@ -972,6 +1242,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     primeHeroInitialState();
+    initCookieConsent();
 
     initLoader().finally(async () => {
         const headerAnimation = initHeader();
@@ -984,6 +1255,8 @@ document.addEventListener('DOMContentLoaded', () => {
         await headerAnimation;
         initSectionReveal();
         initAboutCards();
+        initSegments();
+        initBrands();
         initGallery();
         initVideo();
         initSmoothScroll();

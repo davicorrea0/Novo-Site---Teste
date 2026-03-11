@@ -28,6 +28,7 @@ function cortar_texto($text, $limit = 150)
     return $text;
 }
 add_theme_support('post-thumbnails');
+add_theme_support('site-icon');
 
 function remove_comments()
 {        //Posts

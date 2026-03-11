@@ -1,7 +1,7 @@
 <?php
 /* Maintain compatibility if image optimization plugin is not active/installed */
 if (!function_exists('optimize_media')) {
-    function optimize_media($arg) {
+    function optimize_media($arg, ...$args) {
         return $arg;
     }
 }
@@ -142,7 +142,6 @@ remove_action('wp_head', 'wp_shortlink_wp_head');
 remove_action('wp_head', 'wp_oembed_add_discovery_links');
 remove_action('wp_head', 'feed_links', 2);
 remove_action('wp_head', 'feed_links_extra', 3);
-
 
 
 

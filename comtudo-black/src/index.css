@@ -1,0 +1,58 @@
+@font-face {
+  font-family: 'Kinn';
+  src: url('/fonts/Kinn-Regular.woff2') format('woff2'),
+       url('/fonts/Kinn-Regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Kinn';
+  src: url('/fonts/Kinn-Medium.woff2') format('woff2'),
+       url('/fonts/Kinn-Medium.woff') format('woff');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Kinn';
+  src: url('/fonts/Kinn-Bold.woff2') format('woff2'),
+       url('/fonts/Kinn-Bold.woff') format('woff');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+  --font-heading: "Kinn", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Playfair Display", ui-serif, Georgia, serif;
+  
+  --color-primary: #1a1a1a;
+  --color-secondary: #DADADA;
+  --color-accent: #d4af37; /* Gold accent */
+}
+
+@layer base {
+  body {
+    @apply bg-secondary text-primary font-sans antialiased font-light;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading tracking-tight font-normal;
+  }
+}
+
+@layer utilities {
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}

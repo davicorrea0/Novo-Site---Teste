@@ -69,6 +69,8 @@
         </div>
     </footer>
 
+    <?php get_template_part('partials/cookie-consent'); ?>
+
     <?php wp_footer(); ?>
 </body>
 </html>
