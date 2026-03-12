@@ -4414,3 +4414,79 @@ body.cb-hero-locked #cb-hero .cb-hero__container {
         aspect-ratio: 3 / 4;
     }
 }
+
+/* ============================================
+   FINAL MOBILE AND TABLET FIXES
+   ============================================ */
+.cb-segment-card {
+    height: auto;
+}
+
+@media (max-width: 767.98px) {
+    .cb-about__cards {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .cb-segments__grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        justify-content: stretch;
+    }
+
+    .cb-segment-card {
+        width: 100%;
+        min-height: 0;
+        padding: 1.5rem;
+    }
+
+    .cb-segment-card__icon {
+        margin-bottom: 2rem;
+    }
+
+    .cb-segment-card__content h3 {
+        min-height: 0;
+        margin-bottom: 1.25rem;
+        font-size: clamp(1.125rem, 5vw, 1.3rem);
+    }
+
+    .cb-segment-card__list {
+        gap: 0.875rem;
+    }
+
+    .cb-segment-card__list li {
+        font-size: 0.95rem;
+        line-height: 1.65;
+    }
+
+    .cb-about-card__back {
+        padding: 1.5rem;
+    }
+
+    .cb-about-card__back-title {
+        font-size: clamp(1.35rem, 5vw, 1.6rem);
+    }
+
+    .cb-about-card__back-desc {
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+
+    .cb-about-card__back-cta {
+        font-size: 0.8125rem;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1023.98px) {
+    .cb-segment-card {
+        width: calc(50% - 0.75rem);
+        min-height: 0;
+    }
+
+    .cb-segment-card__content h3 {
+        min-height: 0;
+    }
+
+    .cb-segment-card__list li {
+        font-size: 0.9375rem;
+    }
+}
