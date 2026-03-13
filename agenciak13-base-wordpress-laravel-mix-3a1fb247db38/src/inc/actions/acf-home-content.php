@@ -134,7 +134,7 @@ function k13_register_home_content_fields()
                 'return_format' => 'array',
                 'preview_size' => 'medium',
                 'library' => 'all',
-                'mime_types' => 'jpg,jpeg,png,webp',
+                'mime_types' => 'jpg,jpeg,png,webp,gif',
                 'wrapper' => array(
                     'width' => '50',
                 ),
@@ -459,6 +459,22 @@ function k13_register_home_content_fields()
                 'name' => 'home_contact_whatsapp_url',
                 'type' => 'url',
                 'default_value' => 'https://wa.me/554236299700',
+            ),
+            array(
+                'key' => 'field_k13_tab_footer',
+                'label' => 'Footer',
+                'type' => 'tab',
+            ),
+            array(
+                'key' => 'field_k13_home_footer_smart_link',
+                'label' => 'Link da logo Smart no footer',
+                'name' => 'footer_smart_link',
+                'type' => 'url',
+                'instructions' => 'Esse link sera usado na logo Smart do footer.',
+                'placeholder' => 'https://',
+                'wrapper' => array(
+                    'width' => '50',
+                ),
             ),
         ),
         'location' => array(

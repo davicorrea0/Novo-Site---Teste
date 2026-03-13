@@ -54,5 +54,7 @@ mix.then(() => {
     fs.copySync(SOURCE_PATH + '/fonts', ASSETS_PATH + '/fonts')
     // Keep SVG partials untouched by HTML minifier (prevents malformed <path> output).
     fs.copySync(SOURCE_PATH + '/pages/partials', THEME_PATH + '/partials')
-    fs.copySync(SOURCE_PATH + '/screenshot.png', THEME_PATH + '/screenshot.png');
+    if (fs.existsSync(SOURCE_PATH + '/screenshot.png')) {
+        fs.copySync(SOURCE_PATH + '/screenshot.png', THEME_PATH + '/screenshot.png');
+    }
 });

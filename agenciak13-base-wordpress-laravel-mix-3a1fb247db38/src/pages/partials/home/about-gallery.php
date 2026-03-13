@@ -76,9 +76,16 @@
 </section>
 
 <section class="cb-carousel-section">
-    <div class="cb-carousel__wrapper">
+        <div class="cb-carousel__wrapper">
         <div class="cb-carousel__header">
-            <h2 class="cb-carousel__title"><?php echo wp_kses_post($carousel_title); ?></h2>
+            <h2 class="cb-carousel__title cb-carousel__title--fixed">
+                <?php foreach ($carousel_title_lines as $carousel_title_line) : ?>
+                    <span class="cb-carousel__title-line">
+                        <span><?php echo wp_kses_post($carousel_title_line); ?></span>
+                    </span>
+                <?php endforeach; ?>
+            </h2>
+            <h2 class="cb-carousel__title"><?php echo wp_kses_post($carousel_title_plain); ?></h2>
 
             <div class="cb-carousel__nav-btns">
                 <button id="cb-carousel-prev" class="cb-carousel__nav-btn" type="button" aria-label="<?php esc_attr_e('Slide anterior', 'comtudo-black'); ?>">
@@ -107,10 +114,11 @@
                             >
                                 <img class="cb-gallery-item__img" src="<?php echo esc_url($gallery_image['src']); ?>" alt="<?php echo esc_attr($gallery_image['alt']); ?>">
                                 <div class="cb-gallery-item__hover">
-                                    <div class="cb-gallery-item__plus">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                            <line x1="12" y1="5" x2="12" y2="19"></line>
-                                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                                    <div class="cb-gallery-item__plus" style="background: transparent; box-shadow: none;">
+                                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="width: clamp(1.1644rem, 1.09rem + 0.46vw, 1.4375rem); height: clamp(1.1644rem, 1.09rem + 0.46vw, 1.4375rem);">
+                                            <path d="M7.57643 4.89303H6.45634V3.77329C6.45634 3.41389 6.16391 3.12136 5.80451 3.12136C5.44497 3.12136 5.15253 3.41389 5.15253 3.77329V4.89303H4.03252C3.67305 4.89303 3.38062 5.18557 3.38062 5.54473C3.38062 5.90436 3.67305 6.19666 4.03252 6.19666H5.15253V7.31616C5.15253 7.67604 5.44497 7.96809 5.80451 7.96809C6.16391 7.96809 6.45634 7.67604 6.45634 7.31616V6.19666H7.57643C7.9359 6.19666 8.22826 5.90436 8.22826 5.54473C8.22826 5.18557 7.9359 4.89303 7.57643 4.89303Z" fill="white"/>
+                                            <path fill-rule="evenodd" clip-rule="evenodd" d="M1.88123 1.6224C4.04438 -0.540678 7.56435 -0.540919 9.72772 1.6224C11.891 3.78499 11.891 7.3047 9.72772 9.4673C8.67974 10.5154 7.28645 11.0921 5.80451 11.0921C4.52687 11.0921 3.31537 10.663 2.33412 9.87326L0.858964 11.3483L0 10.4894L1.47508 9.01452C0.685382 8.03352 0.256124 6.82184 0.256124 5.54473C0.256124 4.06295 0.833241 2.67002 1.88123 1.6224ZM8.86868 8.60856C8.05013 9.42694 6.96196 9.8778 5.80451 9.8778C4.64692 9.8778 3.55875 9.42694 2.74019 8.60856C1.92179 7.79018 1.47106 6.70244 1.47106 5.54473C1.47106 4.38773 1.92179 3.29974 2.74019 2.48137C3.58514 1.63648 4.69464 1.21428 5.80451 1.21428C6.91394 1.21428 8.02396 1.63648 8.86868 2.48137C10.5582 4.17065 10.5582 6.91927 8.86868 8.60856ZM6.45634 4.89303H7.57643C7.9359 4.89303 8.22826 5.18557 8.22826 5.54473C8.22826 5.90436 7.9359 6.19666 7.57643 6.19666H6.45634V7.31616C6.45634 7.67604 6.16391 7.96809 5.80451 7.96809C5.44497 7.96809 5.15253 7.67604 5.15253 7.31616V6.19666H4.03252C3.67305 6.19666 3.38062 5.90436 3.38062 5.54473C3.38062 5.18557 3.67305 4.89303 4.03252 4.89303H5.15253V3.77329C5.15253 3.41389 5.44497 3.12136 5.80451 3.12136C6.16391 3.12136 6.45634 3.41389 6.45634 3.77329V4.89303Z" fill="white"/>
+                                            <path fill-rule="evenodd" clip-rule="evenodd" d="M6.45634 4.89303H7.57643C7.9359 4.89303 8.22826 5.18557 8.22826 5.54473C8.22826 5.90436 7.9359 6.19666 7.57643 6.19666H6.45634V7.31616C6.45634 7.67604 6.16391 7.96809 5.80451 7.96809C5.44497 7.96809 5.15253 7.67604 5.15253 7.31616V6.19666H4.03252C3.67305 6.19666 3.38062 5.90436 3.38062 5.54473C3.38062 5.18557 3.67305 4.89303 4.03252 4.89303H5.15253V3.77329C5.15253 3.41389 5.44497 3.12136 5.80451 3.12136C6.16391 3.12136 6.45634 3.41389 6.45634 3.77329V4.89303Z" fill="white"/>
                                         </svg>
                                     </div>
                                 </div>
@@ -140,5 +148,19 @@
             <polyline points="9 18 15 12 9 6"></polyline>
         </svg>
     </button>
-    <img id="cb-lightbox-img" class="cb-lightbox__img" src="<?php echo esc_url($gallery_images[0]['src']); ?>" alt="Galeria ampliada">
+    <div class="cb-lightbox__viewport">
+        <div class="swiper cb-lightbox__swiper">
+            <div class="swiper-wrapper">
+                <?php foreach ($gallery_images as $gallery_lightbox_image) : ?>
+                    <div class="swiper-slide">
+                        <img
+                            class="cb-lightbox__img"
+                            src="<?php echo esc_url($gallery_lightbox_image['src']); ?>"
+                            alt="<?php echo esc_attr($gallery_lightbox_image['alt']); ?>"
+                        >
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </div>
 </div>

@@ -1,0 +1,7 @@
+interface:
+  display_name: "Migrador Site/Design -> WordPress"
+  short_description: "Migra React, HTML ou Figma para WordPress customizado"
+  default_prompt: "Use $frontend-wordpress-migrator para converter React, Vite, Next.js, HTML/CSS/JS puro ou um layout vindo do Figma via MCP em um tema WordPress customizado, preservando layout, secoes editaveis, componentes dinamicos conectados ao ACF, templates PHP e animacoes. Se o projeto usar K13 com Laravel Mix, adapte a migracao a essa estrutura."
+
+policy:
+  allow_implicit_invocation: true

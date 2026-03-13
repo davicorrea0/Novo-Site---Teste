@@ -5,8 +5,34 @@
 
 get_header();
 
-$k13_get_image_url = static function ($image, $preferred_size = 'large') {
+$k13_is_gif_image = static function ($image) {
+    if (is_array($image) && !empty($image['mime_type'])) {
+        return strtolower((string) $image['mime_type']) === 'image/gif';
+    }
+
+    $image_url = '';
+
+    if (is_array($image) && !empty($image['url'])) {
+        $image_url = (string) $image['url'];
+    } elseif (is_string($image) && $image !== '') {
+        $image_url = $image;
+    }
+
+    if ($image_url === '') {
+        return false;
+    }
+
+    $image_path = (string) parse_url($image_url, PHP_URL_PATH);
+
+    return strtolower((string) pathinfo($image_path, PATHINFO_EXTENSION)) === 'gif';
+};
+
+$k13_get_image_url = static function ($image, $preferred_size = 'large') use ($k13_is_gif_image) {
     if (is_array($image)) {
+        if ($k13_is_gif_image($image) && !empty($image['url'])) {
+            return (string) $image['url'];
+        }
+
         if (!empty($image['sizes'][$preferred_size])) {
             return (string) $image['sizes'][$preferred_size];
         }
@@ -155,7 +181,7 @@ $about_texts = array(
     'Um espa&ccedil;o premium que oferece acabamentos de alt&iacute;ssima qualidade, assinados por marcas consolidadas e com novidades de mercado.',
 );
 $about_card_cta_label = 'SAIBA MAIS';
-$carousel_title = 'DESCUBRA UM ESPACO ONDE ACONTECE A UNIAO PERFEITA ENTRE DESIGN E LUXO, ONDE CADA DETALHE E PENSADO PARA IMPRESSIONAR.';
+$carousel_title = "DESCUBRA UM ESPACO ONDE\nACONTECE A UNIAO PERFEITA ENTRE\nDESIGN E LUXO, ONDE CADA DETALHE\nE PENSADO PARA IMPRESSIONAR.";
 
 $about_cards = array(
     array(
@@ -465,6 +491,26 @@ if (empty($about_title_lines)) {
 $about_title_plain = trim(wp_strip_all_tags(str_replace(array("\r\n", "\r", "\n"), ' ', $about_title_multiline)));
 if ($about_title_plain === '') {
     $about_title_plain = implode(' ', $about_title_lines);
+}
+
+$carousel_title_lines = $k13_split_lines($carousel_title);
+$carousel_title_plain = trim(wp_strip_all_tags(str_replace(array("\r\n", "\r", "\n"), ' ', $carousel_title)));
+if ($carousel_title_plain === '') {
+    $carousel_title_plain = implode(' ', $carousel_title_lines);
+}
+
+$carousel_title_normalized = strtoupper(preg_replace('/\s+/', ' ', trim(remove_accents($carousel_title_plain))));
+$carousel_title_matches_default = $carousel_title_normalized === 'DESCUBRA UM ESPACO ONDE ACONTECE A UNIAO PERFEITA ENTRE DESIGN E LUXO, ONDE CADA DETALHE E PENSADO PARA IMPRESSIONAR.';
+
+if (empty($carousel_title_lines) || (count($carousel_title_lines) === 1 && $carousel_title_matches_default)) {
+    $carousel_title_lines = array(
+        'DESCUBRA UM ESPA&Ccedil;O ONDE',
+        'ACONTECE A UNI&Atilde;O PERFEITA ENTRE',
+        'DESIGN E LUXO, ONDE CADA DETALHE',
+        '&Eacute; PENSADO PARA IMPRESSIONAR.',
+    );
+
+    $carousel_title_plain = implode(' ', $carousel_title_lines);
 }
 
 if (empty($gallery_images)) {

@@ -57,7 +57,7 @@ $cb_nav_links = array(
             <div class="cb-nav-pill__links">
                 <?php foreach ($cb_nav_links as $cb_nav_link) : ?>
                     <a
-                        class="cb-nav-pill__link"
+                        class="cb-nav-pill__link<?php echo $cb_nav_link['href'] === '#sobre' ? ' cb-nav-pill__link--about' : ''; ?>"
                         href="<?php echo esc_url($home_anchor_base . $cb_nav_link['href']); ?>"
                     >
                         <?php echo esc_html($cb_nav_link['label']); ?>
@@ -95,7 +95,7 @@ $cb_nav_links = array(
 <div id="cb-mobile-menu" class="cb-mobile-menu" aria-hidden="true">
     <?php foreach ($cb_nav_links as $cb_nav_link) : ?>
         <a
-            class="cb-mobile-menu__link"
+            class="cb-mobile-menu__link<?php echo $cb_nav_link['href'] === '#sobre' ? ' cb-mobile-menu__link--about' : ''; ?>"
             href="<?php echo esc_url($home_anchor_base . $cb_nav_link['href']); ?>"
             onclick="closeMobileMenu()"
         >

@@ -29,6 +29,7 @@ function cortar_texto($text, $limit = 150)
 }
 add_theme_support('post-thumbnails');
 add_theme_support('site-icon');
+add_theme_support('title-tag');
 
 function remove_comments()
 {        //Posts

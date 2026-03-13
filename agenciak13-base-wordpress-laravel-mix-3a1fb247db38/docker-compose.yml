@@ -29,6 +29,7 @@ services:
     volumes:
       - ./content/themes/base:/var/www/html/wp-content/themes/base
       - ./content/plugins:/var/www/html/wp-content/plugins
+      - ./docker/php/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini:ro
     depends_on:
       - db
 
